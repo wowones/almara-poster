@@ -35,3 +35,35 @@ export function title(draw: Draw, text: string, baseline: number, cap: number, c
     x += glyph.width * cap + (i < text.length - 1 ? tracking - ((pair === 'AL' || pair === 'LM') ? cap * 0.04 : 0) : 0);
   }
 }
+
+// Original monoline small capitals for the place's epithet, in a 0.56 em cell.
+const smallGlyphs: Record<string, Point[][]> = {
+  T: [[[0,0],[0.56,0]],[[0.28,0],[0.28,1]]],
+  H: [[[0,0],[0,1]],[[0.56,0],[0.56,1]],[[0,0.49],[0.56,0.49]]],
+  E: [[[0.56,0],[0,0],[0,1],[0.56,1]],[[0,0.49],[0.46,0.49]]],
+  G: [[[0.54,0.15],[0.45,0.03],[0.16,0.03],[0.02,0.18],[0.02,0.82],[0.16,0.97],[0.47,0.97],[0.55,0.86],[0.55,0.54],[0.32,0.54]]],
+  A: [[[0,1],[0.28,0],[0.56,1]],[[0.12,0.61],[0.44,0.61]]],
+  O: [[[0.16,0.02],[0.41,0.02],[0.55,0.18],[0.55,0.82],[0.41,0.98],[0.16,0.98],[0.01,0.82],[0.01,0.18],[0.16,0.02]]],
+  F: [[[0,1],[0,0],[0.56,0]],[[0,0.47],[0.45,0.47]]],
+  M: [[[0,1],[0,0],[0.28,0.59],[0.56,0],[0.56,1]]],
+  I: [[[0.13,0],[0.43,0]],[[0.28,0],[0.28,1]],[[0.13,1],[0.43,1]]],
+  R: [[[0,1],[0,0],[0.36,0],[0.53,0.12],[0.53,0.35],[0.36,0.49],[0,0.49]],[[0.29,0.49],[0.56,1]]],
+  S: [[[0.53,0.14],[0.42,0.02],[0.15,0.02],[0.02,0.15],[0.02,0.36],[0.15,0.47],[0.41,0.53],[0.54,0.65],[0.54,0.84],[0.40,0.98],[0.14,0.98],[0.01,0.85]]],
+};
+
+export function subtitle(draw: Draw, text: string, baseline: number, cap: number, c: Color, alpha = 0.8): void {
+  const tracking=0.34*cap;
+  const advance=(letter: string) => (letter===' '?0.24:0.56)*cap;
+  const width=[...text].reduce((sum,letter)=>sum+advance(letter),0)+(text.length-1)*tracking;
+  const left=(1024-width)/2;
+  let x=left;
+  for(const letter of text) {
+    if(letter!==' ') for(const stroke of smallGlyphs[letter]) {
+      draw.line(stroke.map(([px,py]): Point=>[x+px*cap,baseline-cap+py*cap]),1.25,c,alpha);
+    }
+    x+=advance(letter)+tracking;
+  }
+  const ruleY=baseline-cap*0.48;
+  draw.line([[left-82,ruleY],[left-22,ruleY]],1,c,alpha);
+  draw.line([[left+width+22,ruleY],[left+width+82,ruleY]],1,c,alpha);
+}

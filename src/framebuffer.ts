@@ -35,8 +35,11 @@ export class Framebuffer {
       for (let x = 0; x < 1024; x++) {
         const inside = x >= 26 && x < 998 && y >= 26 && y < 998;
         const nx = (x - 512) / 486, ny = (y - 512) / 486;
-        const vignette = inside ? 1 - 0.10 * Math.pow(Math.max(0, nx * nx * ny * ny), 1.2) : 1;
-        const grain = inside ? (hash(Math.floor(x / 2), Math.floor(y / 13)) - 0.5) * 2.6 : 0;
+        const vignette = inside ? 1 - 0.17 * Math.pow(Math.max(0, nx * nx * ny * ny), 1.15) : 1;
+        const tooth = (hash(Math.floor(x / 2), Math.floor(y / 2)) - 0.5) * 7.2;
+        const weave = (hash(Math.floor(x / 2), 733) - 0.5) * 1.1
+          + (hash(811, Math.floor(y / 2)) - 0.5) * 0.7;
+        const grain = inside ? tooth + weave : 0;
         for (let k = 0; k < 3; k++) {
           let sum = 0;
           for (let sy = 0; sy < 3; sy++) for (let sx = 0; sx < 3; sx++) sum += this.data[((y * 3 + sy) * this.width + x * 3 + sx) * 3 + k];
